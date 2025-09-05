@@ -269,6 +269,3 @@ def generate_final_scorecard():
     except Exception as e:
         print(f"Error in generate_final_scorecard: {e}")
         return jsonify({'error': f'An unexpected error occurred during final evaluation: {str(e)}'}), 500
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=True)
