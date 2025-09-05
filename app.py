@@ -30,10 +30,12 @@ except Exception as e:
     print(f"Error configuring Gemini API: {e}")
     model = None
 
+
 @app.route('/')
 def index():
     """Renders the main page of the application."""
     return render_template('index.html')
+
 
 @app.route('/extract_resume_text', methods=['POST'])
 def extract_resume_text():
@@ -110,6 +112,7 @@ def generate_questions():
     except Exception as e:
         return jsonify({'error': f'An unexpected error occurred: {str(e)}'}), 500
 
+
 @app.route('/make_casual', methods=['POST'])
 def make_casual():
     """API endpoint to rewrite a formal question in a casual tone."""
@@ -135,8 +138,8 @@ def make_casual():
         
         return jsonify(response_json)
 
-    except Exception as e:
-        return jsonify({'casual_question': question}) # Fallback to original question on error
+    except Exception:
+        return jsonify({'casual_question': question})  # Fallback to original question on error
 
 
 @app.route('/score_answer', methods=['POST'])
@@ -173,6 +176,7 @@ def score_answer():
         return jsonify({'error': 'Failed to parse the scoring response from the AI model.'}), 500
     except Exception as e:
         return jsonify({'error': f'An unexpected error occurred during scoring: {str(e)}'}), 500
+
 
 @app.route('/generate_final_scorecard', methods=['POST'])
 def generate_final_scorecard():
@@ -269,6 +273,3 @@ def generate_final_scorecard():
     except Exception as e:
         print(f"Error in generate_final_scorecard: {e}")
         return jsonify({'error': f'An unexpected error occurred during final evaluation: {str(e)}'}), 500
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=True)
