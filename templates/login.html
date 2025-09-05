@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - AI Interview</title>
+    <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #030712; }
+        .form-container { transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; }
+        .hidden-form { opacity: 0; transform: scale(0.95); pointer-events: none; position: absolute; }
+        .visible-form { opacity: 1; transform: scale(1); }
+    </style>
+</head>
+<body class="text-gray-200">
+    <div class="min-h-screen flex items-center justify-center p-4 bg-grid-gray-700/[0.2]">
+        <div class="w-full max-w-md relative">
+            <!-- Logo Placeholder -->
+            <div class="text-center mb-6">
+                 <svg class="mx-auto h-12 w-auto text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-1.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25A2.25 2.25 0 015.25 3h13.5A2.25 2.25 0 0121 5.25zm-6-2.25h.008v.008H15V3z" />
+                </svg>
+                <h1 class="text-3xl font-bold text-white mt-2">AI Interview Platform</h1>
+            </div>
+
+            <!-- Login Form -->
+            <div id="login-form-container" class="form-container visible-form">
+                <form id="login-form" class="bg-gray-900/50 backdrop-blur-sm border border-gray-700 p-8 rounded-2xl shadow-lg space-y-6">
+                    <h2 class="text-2xl font-bold text-center text-white">Admin Login</h2>
+                    <div>
+                        <label for="login-email" class="block text-sm font-medium text-gray-400">Email</label>
+                        <input type="email" id="login-email" required class="mt-1 block w-full bg-gray-800 border border-gray-600 rounded-md p-3 focus:ring-2 focus:ring-indigo-500 transition">
+                    </div>
+                    <div>
+                        <label for="login-password" class="block text-sm font-medium text-gray-400">Password</label>
+                        <input type="password" id="login-password" required class="mt-1 block w-full bg-gray-800 border border-gray-600 rounded-md p-3 focus:ring-2 focus:ring-indigo-500 transition">
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition-transform transform hover:scale-105">Login</button>
+                    <p class="text-center text-sm text-gray-400">
+                        Don't have an account? <button type="button" id="show-register-btn" class="font-medium text-indigo-400 hover:underline">Sign up</button>
+                    </p>
+                </form>
+            </div>
+
+            <!-- Registration Form -->
+            <div id="register-form-container" class="form-container hidden-form w-full">
+                <form id="register-form" class="bg-gray-900/50 backdrop-blur-sm border border-gray-700 p-8 rounded-2xl shadow-lg space-y-4">
+                    <h2 class="text-2xl font-bold text-center text-white">Admin Registration</h2>
+                    <input type="text" id="register-company" placeholder="Company Name" required class="block w-full bg-gray-800 border border-gray-600 rounded-md p-3">
+                    <input type="email" id="register-email" placeholder="Email Address" required class="block w-full bg-gray-800 border border-gray-600 rounded-md p-3">
+                    <input type="tel" id="register-phone" placeholder="Phone Number" required class="block w-full bg-gray-800 border border-gray-600 rounded-md p-3">
+                    <input type="password" id="register-password" placeholder="Password" required class="block w-full bg-gray-800 border border-gray-600 rounded-md p-3">
+                    <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition-transform transform hover:scale-105">Register</button>
+                     <p class="text-center text-sm text-gray-400">
+                        Already have an account? <button type="button" id="show-login-btn" class="font-medium text-indigo-400 hover:underline">Log in</button>
+                    </p>
+                </form>
+            </div>
+            <p id="auth-error" class="text-red-400 text-center mt-4 h-5"></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginContainer = document.getElementById('login-form-container');
+            const registerContainer = document.getElementById('register-form-container');
+            const showRegisterBtn = document.getElementById('show-register-btn');
+            const showLoginBtn = document.getElementById('show-login-btn');
+            
+            const toggleForms = (showRegister) => {
+                if (showRegister) {
+                    loginContainer.classList.replace('visible-form', 'hidden-form');
+                    registerContainer.classList.replace('hidden-form', 'visible-form');
+                } else {
+                    registerContainer.classList.replace('visible-form', 'hidden-form');
+                    loginContainer.classList.replace('hidden-form', 'visible-form');
+                }
+                document.getElementById('auth-error').textContent = '';
+            };
+
+            showRegisterBtn.addEventListener('click', () => toggleForms(true));
+            showLoginBtn.addEventListener('click', () => toggleForms(false));
+            
+            // The rest of your form submission logic from the previous turn goes here
+            // (loginForm.addEventListener, registerForm.addEventListener, etc.)
+            // No changes are needed for that logic.
+             const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const authErrorEl = document.getElementById('auth-error');
+
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                authErrorEl.textContent = '';
+                try {
+                    const response = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: document.getElementById('login-email').value,
+                            password: document.getElementById('login-password').value
+                        })
+                    });
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.error);
+                    window.location.href = '/dashboard';
+                } catch (error) {
+                    authErrorEl.textContent = error.message;
+                }
+            });
+
+            registerForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                authErrorEl.textContent = '';
+                try {
+                    const response = await fetch('/api/register', {
+                         method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            company_name: document.getElementById('register-company').value,
+                            email: document.getElementById('register-email').value,
+                            phone: document.getElementById('register-phone').value,
+                            password: document.getElementById('register-password').value
+                        })
+                    });
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.error);
+                    alert(data.message);
+                    toggleForms(false);
+                } catch (error) {
+                     authErrorEl.textContent = error.message;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
